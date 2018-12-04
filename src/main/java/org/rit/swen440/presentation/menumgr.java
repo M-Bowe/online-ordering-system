@@ -12,6 +12,7 @@ import java.util.Optional;
 public class menumgr
 {
     int currentLevel = 0;
+    int lastLevel = 0;
     String currentCategoryName;
     String currentItemName;
     category currentCategory;
@@ -52,9 +53,11 @@ public class menumgr
 
     public void Level0()
     {
+        System.out.println("In Level 0");
         menu m = new menu();
         List<String> categories = controller.getCategories();
         m.loadMenu(categories);
+        m.addMenuItem("'s' to view shopping cart");
         m.addMenuItem("'q' to Quit");
         System.out.println("The following org.rit.swen440.presentation.categories are available");
         m.printMenu();
@@ -71,6 +74,11 @@ public class menumgr
         {
             currentLevel--;
         }
+        else if (Objects.equals(result,"s"))
+        {
+            lastLevel = currentLevel;
+            currentLevel = 2;
+        }
         else
         {
             currentLevel++;
@@ -83,6 +91,8 @@ public class menumgr
 
     public void Level1()
     {
+        System.out.println("In Level 1");
+
         menu m = new menu();
 
         //items it = new items("orderSys/" + currentCategory.getName());
@@ -96,6 +106,7 @@ public class menumgr
              + "($" + controller.getProductInformation(currentCategoryName, itm, Controller.PRODUCT_FIELD.COST) + ")");
 
         m.loadMenu(l);
+        m.addMenuItem("'s' to view shopping cart");
         m.addMenuItem("'q' to quit");
         System.out.println("The following items are available");
         m.printMenu();
@@ -110,10 +121,16 @@ public class menumgr
         }
         catch (Exception e)
         {
-            result = "q";
+            System.out.println(result);
+            //result = "q";
         }
-        if (result == "q")
+        if (Objects.equals(result,"q"))
             currentLevel--;
+        else if (Objects.equals(result,"s"))
+        {
+            lastLevel = currentLevel;
+            currentLevel = 2;
+        }
         else
         {
             //currentLevel++;//Or keep at same level?
@@ -125,6 +142,41 @@ public class menumgr
     public void Level2()
     {
       // SHOPPING CART HERE
+      System.out.println("Shopping cart info");
+      menu m = new menu();
+      List<String> l = new ArrayList<>();
+
+      //items it = new items("orderSys/" + currentCategory.getName());
+
+      // List<item> itemList = controller.getProducts(currentCategoryName);
+      // Load items that've been selected
+      // List<String> itemList = controller.getProducts(currentCategoryName);
+      // List<String> l = new ArrayList<>();
+      System.out.println("");
+      // for (String itm: itemList)
+      //     l.add(controller.getProductInformation(currentCategoryName, itm, Controller.PRODUCT_FIELD.NAME)
+      //      + "($" + controller.getProductInformation(currentCategoryName, itm, Controller.PRODUCT_FIELD.COST) + ")");
+      //
+      // m.loadMenu(l);
+      // m.addMenuItem("'s' to view shopping cart");
+      m.loadMenu(l);
+
+      m.addMenuItem("'q' to quit");
+
+      System.out.println("The following items are in your shopping cart:");
+      m.printMenu();
+      String result = "q";
+      try{
+        result = m.getSelection();
+      }
+
+      catch (Exception e)
+      {
+          result = "q";
+      }
+
+      if (Objects.equals(result, "q"))
+          currentLevel = lastLevel;
 
     }
 
