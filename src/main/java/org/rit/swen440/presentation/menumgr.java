@@ -55,7 +55,7 @@ public class menumgr
         menu m = new menu();
         List<String> categories = controller.getCategories();
         m.loadMenu(categories);
-        m.addMenuItem("'q' to Quit"); 
+        m.addMenuItem("'q' to Quit");
         System.out.println("The following org.rit.swen440.presentation.categories are available");
         m.printMenu();
         String result = "0";
@@ -94,7 +94,7 @@ public class menumgr
         for (String itm: itemList)
             l.add(controller.getProductInformation(currentCategoryName, itm, Controller.PRODUCT_FIELD.NAME)
              + "($" + controller.getProductInformation(currentCategoryName, itm, Controller.PRODUCT_FIELD.COST) + ")");
-        
+
         m.loadMenu(l);
         m.addMenuItem("'q' to quit");
         System.out.println("The following items are available");
@@ -124,6 +124,7 @@ public class menumgr
 
     public void Level2()
     {
+      // SHOPPING CART HERE
 
     }
 
@@ -135,6 +136,7 @@ public class menumgr
         System.out.print(":");
         menu m = new menu();
         String result = m.getSelection();
-        System.out.println("You ordered:" + result);
+        System.out.println(result + " items added to your shopping cart.");
+        // ADD TO SHOPPING CART
     }
 }
