@@ -18,11 +18,12 @@ public class menumgr
     category currentCategory;
     item currentItem;
     private Controller controller;
+    List<CartItem> shoppingCart;
 
     public menumgr()
     {
         controller = new Controller(System.getProperty("fileSystemRoot"));
-
+        shoppingCart = new ArrayList();
     }
 
     public boolean loadLevel(int level)
@@ -53,7 +54,6 @@ public class menumgr
 
     public void Level0()
     {
-        System.out.println("In Level 0");
         menu m = new menu();
         List<String> categories = controller.getCategories();
         m.loadMenu(categories);
@@ -91,7 +91,6 @@ public class menumgr
 
     public void Level1()
     {
-        System.out.println("In Level 1");
 
         menu m = new menu();
 
@@ -182,13 +181,26 @@ public class menumgr
 
     public void OrderQty(String category, String item)
     {
+        double price = Double.parseDouble(controller.getProductInformation(category, item, Controller.PRODUCT_FIELD.COST));
+
         System.out.println("Please select a quantity");
         System.out.println(controller.getProductInformation(category, item, Controller.PRODUCT_FIELD.NAME) +
                 " availability:" + controller.getProductInformation(category, item, Controller.PRODUCT_FIELD.INVENTORY));
         System.out.print(":");
         menu m = new menu();
         String result = m.getSelection();
+        int qty;
+        try{
+          qty = Integer.parseInt(result);
+        }
+        catch (Exception e) {
+          System.out.println("Please enter an integer.");
+          OrderQty(category,item);
+          return;
+        }
+
         System.out.println(result + " items added to your shopping cart.");
+
         // ADD TO SHOPPING CART
     }
 }
