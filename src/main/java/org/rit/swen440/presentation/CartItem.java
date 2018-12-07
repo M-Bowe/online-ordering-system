@@ -19,12 +19,6 @@ public class CartItem
   public int getQuantity() { return quantity;}
   public double getPrice() { return price;}
 
-  public double getTotal(List<CartItem> cart){
-    double total = 0.0;
-    for(CartItem item : cart){
-      total += item.getQuantity() * item.getPrice();
-    }
-    return total;
-  }
+  public void addAmount(int amount){ this.quantity += amount; }
 
 }

@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.text.DecimalFormat;
+
 
 
 public class menumgr
@@ -19,11 +21,13 @@ public class menumgr
     item currentItem;
     private Controller controller;
     List<CartItem> shoppingCart;
+    DecimalFormat df;
 
     public menumgr()
     {
         controller = new Controller(System.getProperty("fileSystemRoot"));
         shoppingCart = new ArrayList();
+        df = new DecimalFormat("####.##");
     }
 
     public boolean loadLevel(int level)
@@ -120,8 +124,9 @@ public class menumgr
         }
         catch (Exception e)
         {
-            System.out.println(result);
+            // System.out.println(result);
             //result = "q";
+
         }
         if (Objects.equals(result,"q"))
             currentLevel--;
@@ -141,7 +146,7 @@ public class menumgr
     public void Level2()
     {
       // SHOPPING CART HERE
-      System.out.println("Shopping cart info");
+      System.out.println("\nShopping cart info");
       menu m = new menu();
       List<String> l = new ArrayList<>();
 
@@ -163,6 +168,16 @@ public class menumgr
       m.addMenuItem("'q' to quit");
 
       System.out.println("The following items are in your shopping cart:");
+      System.out.printf("\t%-20s | %-20s | %-20s\n", "Item", "Quantity", "Price");
+      for (CartItem it : shoppingCart){
+
+        System.out.printf("\t%-20s | %-20s | $%-20s\n", it.getName(), Integer.toString(it.getQuantity()), df.format(it.getPrice()));
+        // System.out.println("  " +  + " |  Amount: " +  + "  | Price: $" + );
+      }
+
+      if(!shoppingCart.isEmpty()) System.out.println("\nCurrent total: $" + df.format(getTotal(shoppingCart)));
+
+
       m.printMenu();
       String result = "q";
       try{
@@ -176,6 +191,7 @@ public class menumgr
 
       if (Objects.equals(result, "q"))
           currentLevel = lastLevel;
+
 
     }
 
@@ -200,7 +216,27 @@ public class menumgr
         }
 
         System.out.println(result + " items added to your shopping cart.");
+        boolean foundVal = false;
+        if(!shoppingCart.isEmpty()){
+          for (CartItem it : shoppingCart){
+              if (item.equals(it.getName())){
+                it.addAmount(qty);
+                foundVal = true;
+                break;
+              }
+          }
+        }
+
+        if(!foundVal) shoppingCart.add(new CartItem(item, qty, price));
 
         // ADD TO SHOPPING CART
+    }
+
+    public double getTotal(List<CartItem> cart){
+      double total = 0.0;
+      for(CartItem item : cart){
+        total += item.getQuantity() * item.getPrice();
+      }
+      return total;
     }
 }
