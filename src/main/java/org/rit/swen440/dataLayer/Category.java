@@ -5,6 +5,7 @@ import lombok.Data;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.sql.*;
 
 /**
  * A product category supported by the Order System
@@ -16,9 +17,23 @@ public class Category {
 
   private Set<Product> products = new HashSet<>();
 
-  public Optional<Product> findProduct(String name) {
+  public Category(String name, String desc) {
+	this.name=name;
+	this.description=desc;
+	}
+
+public Category() {}
+
+public Optional<Product> findProduct(String name) {
     return products.stream()
         .filter(p -> p.getTitle().equalsIgnoreCase(name))
         .findFirst();
   }
+
+public void setName(String name) {this.name = name;}
+public void setDescription(String description) {this.description = description;}
+public void setProducts(Set<Product> loadProducts) {this.products = loadProducts;}
+public Set<Product> getProducts() {return this.products;}
+public String getName(){return this.name;}
+public String getDescription(){ return this.description;}
 }

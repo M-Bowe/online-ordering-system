@@ -9,11 +9,13 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.nio.file.*;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.sql.*;
 
 /**
  * Controls access to data, on start-up scans directories and builds internal
@@ -41,23 +43,15 @@ public class Controller {
    * @param directory root directory
    */
   private void loadCategories(String directory) {
-    this.dirPath = Paths.get(directory);
-
-    DirectoryStream.Filter<Path> dirFilter = new DirectoryStream.Filter<Path>() {
-      @Override
-      public boolean accept(Path path) throws IOException {
-        return Files.isDirectory(path);
+    try {
+      Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/orderingsystem","swen440","swen440");
+      Statement stmt = conn.createStatement();
+      HashSet<Category> toReturn= new HashSet<Category>();
+      ResultSet queryResult = stmt.executeQuery("SELECT name, description FROM category");
+      while(queryResult.next()){
+    	  toReturn.add(new Category(queryResult.getString(1),queryResult.getString(2)));
       }
-    };
-
-    // We're just interested in directories, filter out all other files
-    try (DirectoryStream<Path> stream = Files.newDirectoryStream(dirPath, dirFilter)) {
-      for (Path file : stream) {
-        // get the category information from each directory
-        Optional<Category> entry = getCategory(file);
-        entry.ifPresent(categories::add);
-      }
-    } catch (IOException | DirectoryIteratorException e) {
+    } catch (Exception e) {
       // TODO:  Replace with logger
       System.err.println(e);
     }
@@ -70,9 +64,21 @@ public class Controller {
    */
   public List<String> getCategories() {
 
-    return categories.stream()
-        .map(Category::getName)
-        .collect(Collectors.toList());
+    Connection conn;
+	try {
+		conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/orderingsystem","swen440","swen440");
+		Statement stmt = conn.createStatement();
+	    ArrayList<String> toReturn = new ArrayList<String>();
+	    ResultSet queryResult= stmt.executeQuery("SELECT name FROM category");
+	    while(queryResult.next()){
+	    	toReturn.add(queryResult.getString(1));
+	    }
+	    return toReturn;
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	return null;
   }
 
   /**
@@ -81,8 +87,18 @@ public class Controller {
    * @return description
    */
   public String getCategoryDescription(String category) {
-    Optional<Category> match = categories.stream().filter(c -> c.getName().equalsIgnoreCase(category)).findFirst();
-    return match.map(Category::getDescription).orElse(null);
+  	Connection conn;
+	try {
+		conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/orderingsystem","swen440","swen440");
+		Statement stmt = conn.createStatement();
+	    ResultSet queryResult= stmt.executeQuery("SELECT description FROM category WHERE name = '"+category+"'");
+	    return queryResult.getString(1);
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+		return null;
+	}
+    
   }
 
   /**
@@ -136,11 +152,13 @@ public class Controller {
    * Loop through all our categories and write any product records that
    * have been updated.
    */
+  /*
   public void writeCategories() {
     for (Category category: categories) {
       writeProducts(category.getProducts());
     }
   }
+  */
 
   /* -----------------------------------
    *
@@ -233,20 +251,21 @@ public class Controller {
    *
    * @param products set of products
    */
-  private void writeProducts(Set<Product> products) {
+  /*private void writeProducts(Set<Product> products) {
     for (Product product : products) {
       if (product.isUpdated()) {
         updateProduct(product);
       }
     }
   }
+  */
 
   /**
    * Write an updated product
    *
    * @param product the product
    */
-  private void updateProduct(Product product) {
+  /*private void updateProduct(Product product) {
     try (BufferedWriter writer = Files.newBufferedWriter(product.getPath(), Charset.forName("US-ASCII"))){
       writer.write(String.valueOf(product.getSkuCode()));
       writer.newLine();
@@ -264,5 +283,5 @@ public class Controller {
     } catch(IOException e) {
       System.err.println("Failed to write product file for:" + product.getTitle());
     }
-  }
+  }*/
 }
