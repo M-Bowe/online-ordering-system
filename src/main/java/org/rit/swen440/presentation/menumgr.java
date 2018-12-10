@@ -190,7 +190,7 @@ public class menumgr
       }
 
       if (Objects.equals(result, "q"))
-          currentLevel = lastLevel;
+          currentLevel = 0;
 
 
     }

@@ -46,12 +46,13 @@ result and a better final grade.
  - Lombok Library: Lombok annotations are used in places to auto-generate getters and
  setters.  
  - JUnit Library:  Included but never used.
-
+ - MySQL: Used in order to connect the system to an external MySQL database
+ 
 ### Building
 The development team choose Maven as their build tool.  Maven 3.1.0 and 3.3.9
 have both been successfully used.  
 
-With Maven installed, running **mvn clean install** from the root install directory
+With Maven installed, running **mvn package -D maven.test.skip=true** from the root install directory
 should successfully build the program.  It is expected that every build will also
 execute the test lifecycle ensuring that unit tests all still pass.
 
@@ -60,18 +61,22 @@ The development team pushed developing unit tests to the
  end of their development cycle.  As is often the case, this was a poor
  decision.  Time was never allocated and no tests were written.
 
-The stakeholders have high hopes that the new _Crack Teams_ taking over
-the project have a better sense of the importance of unit testing
-and deliver code with good unit tests and high coverage.  
+Unfortunately due to a lack of bandwidth for the development cycle, the team was unable
+to develop any solutions for testing. A bid will surely be presented for next development
+cycle to establish a proper test plan, as the need for proper testing will only grow.  
 
 ## Running the Online Ordering System
-The previous team left no written instructions on how to run the system, other
-than it appears the main app runs via menutest.
-Management sincerely hopes the new teams understand the importance of good
-documentation and provide this critical piece of information.
+Prior to running the Online Ordering System for the first time, it is necessary to
+create and initialize the database. Install MySQL on the machine and execute the 
+"db_init.sql" file included in the package. This will establish tables for products,
+categories, and transactions, as well as create some data points to use.
 
-**It should be noted that a large part of the compensation for working on
-this project is dependent on the management team being able to evaluate it.
-A key part of evaluation will be installing, building and running the
-system you produce.
-Additionally, explaining architecture choices going forward is essential.**
+Once the database has been created, a user is free to run the program. An executable
+jar file has been included in the package and can be run using the cmd or bash command
+"java -jar onlineorderingsystem.jar" Additionally, if the user chooses to build the
+program themselves, maven can be used by executing the cmd or bash command 
+"mvn package -D maven.test.skip=true" This will create a file called run.bat which
+can be executed by entering the cmd or bash command "./run.bat" Note that the
+preferred method of execution is the included jar file.
+
+

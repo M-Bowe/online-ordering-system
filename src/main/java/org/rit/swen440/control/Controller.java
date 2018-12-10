@@ -53,7 +53,7 @@ public class Controller {
       }
     } catch (Exception e) {
       // TODO:  Replace with logger
-      System.err.println(e);
+      System.err.println("heck");
     }
   }
 
@@ -108,29 +108,39 @@ public class Controller {
    * @return List of Products in the category
    */
   public List<String> getProducts(String categoryName) {
-    Optional<Category> category = findCategory(categoryName);
-
-   return category.map(c -> c.getProducts().stream()
-              .map(Product::getTitle)
-              .collect(Collectors.toList()))
-           .orElse(null);
+    try {
+    	ArrayList<String> productNames = new ArrayList<String>();
+    	Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/orderingsystem","swen440","swen440");
+		Statement stmt = conn.createStatement();
+		String query = ("Select p.name FROM product p INNER JOIN category c ON p.categoryId=c.id WHERE c.name='"+categoryName+"'");
+		ResultSet products = stmt.executeQuery(query);
+		while(products.next()){
+			productNames.add(products.getString(1));
+		}
+		
+		return productNames;
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+		return null;
+	}
   }
 
 
   public String getProductInformation(String category, String product, PRODUCT_FIELD field) {
-   Optional<Product> selectedProduct = getProduct(category, product);
+   Optional<Product> selectedProduct = getProduct(category, product); 
    switch (field) {
      case NAME:
-       return selectedProduct.map(Product::getTitle).orElse(null);
+       return selectedProduct.map(Product::getTitle).orElse("testname");
 
      case DESCRIPTION:
-       return selectedProduct.map(Product::getDescription).orElse(null);
+       return selectedProduct.map(Product::getDescription).orElse("testdesc");
 
      case COST:
-       return selectedProduct.map(p -> String.format("%.2f", p.getCost())).orElse(null);
+       return selectedProduct.map(p -> String.format("%.2f", p.getCost())).orElse("testcost");
 
      case INVENTORY:
-       return selectedProduct.map(p -> String.valueOf(p.getItemCount())).orElse(null);
+       return selectedProduct.map(p -> String.valueOf(p.getItemCount())).orElse("testqty");
    }
 
    return null;
@@ -171,6 +181,7 @@ public class Controller {
    * @param path directory
    * @return Category object, if .cat file exists
    */
+  /*
   private Optional<Category> getCategory(Path path) {
     DirectoryStream.Filter<Path> catFilter = new DirectoryStream.Filter<Path>() {
       @Override
@@ -196,10 +207,33 @@ public class Controller {
     }
 
     return Optional.empty();
-  }
+  }*/
 
   private Optional<Product> getProduct(String category, String product) {
-    return findCategory(category).map(c -> c.findProduct(product)).orElse(null);
+    try {
+		Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/orderingsystem","swen440","swen440");
+		Statement stmt = conn.createStatement();
+		String categoryEscape=category.replaceAll("'", "\\\\'");
+		String productEscape=product.replaceAll("'", "\\\\'");
+		String query = "SELECT p.sku, p.description, p.price, p.quantity FROM product p INNER JOIN category c ON p.categoryId=c.id WHERE p.name = '"+productEscape+"' AND c.name = '"+categoryEscape+"'";
+		
+		ResultSet queryResult = stmt.executeQuery(query);
+		Product p = new Product();
+		while(queryResult.next()){
+			p.setSkuCode(queryResult.getInt(1));
+			p.setDescription(queryResult.getString(2));
+			p.setCost(queryResult.getBigDecimal(3));
+			p.setItemCount(queryResult.getInt(4));
+			p.setTitle(product);
+		}
+		Optional<Product> toReturn = Optional.of(p);
+		return toReturn;
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+		return Optional.empty();
+	}
+    
   }
 
   /**
@@ -208,7 +242,7 @@ public class Controller {
    * @param path the subdirectory we're working in
    * @return a set of products
    */
-  private Set<Product> loadProducts(Path path) {
+  /*private Set<Product> loadProducts(Path path) {
     DirectoryStream.Filter<Path> productFilter = new DirectoryStream.Filter<Path>() {
       @Override
       public boolean accept(Path path) throws IOException {
@@ -244,7 +278,7 @@ public class Controller {
     }
 
     return products;
-  }
+  }*/
 
   /**
    * Loop through the set of products and write out any updated products
